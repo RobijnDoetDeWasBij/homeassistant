@@ -56,7 +56,7 @@ sequence:
           data: {}
           target: !input light_selector
         - delay: !input delay_duration
-  - service: light.turn_off
+  - service: light.turn_on
     data: {}
     target: !input light_selector
 
