@@ -1,0 +1,70 @@
+blueprint:
+  name: blink light and return
+  description:  >-
+    Script for blinking a light bulb - you can firstly use scenes to set
+    light colors.
+  domain: script
+  input:
+    light_selector:
+      name: Light
+      selector:
+        target:
+          entity:
+            domain: light
+    delay_duration:
+      name: Delay Duration
+      description: "Delay duration in seconds"
+      default: 1
+      selector:
+        number:
+          min: 0.5
+          max: 100
+          unit_of_measurement: s
+    repetitions:
+      name: Repetitions
+      description: "Number of repetitions"
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 500
+    scene_target:
+      name: Scene to activate before
+      description: "Scene to activate before blinking the light"
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+
+variables:
+  lights: !input light_selector
+  scene_target: !input scene_target
+  repetitions: !input repetitions
+  delay: !input delay_duration
+
+sequence:
+  - service: scene.create
+    data:
+      scene_id: lights_before
+      snapshot_entities:
+      - light.lamp_1_wk
+  - choose:
+      - conditions:
+         - "{{ scene_target != 'scene.none' }}"
+        sequence:
+          - service: scene.turn_on
+            entity_id: !input scene_target
+          - delay:
+              seconds: 1
+  - repeat:
+      count: "{{ repetitions * 2 }}"
+      sequence:
+        - service: light.toggle
+          data: {}
+          target: !input light_selector
+        - delay: !input delay_duration
+  - service: scene.turn_on
+    entity_id: scene.lights_before
+
+mode: single
+icon: hassio:lightbulb-on
