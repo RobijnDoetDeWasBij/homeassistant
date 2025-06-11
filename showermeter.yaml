@@ -1,0 +1,8 @@
+blueprint:
+  name: Shower water usage 
+  description: Measures how much water is used when someone is detected showering. For now this is only used with a water meter.
+  domain: automation
+triggers:
+  - trigger: numeric_state
+    entity_id: !input sensor
+    above: !input 
